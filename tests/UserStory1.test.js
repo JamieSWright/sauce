@@ -1,17 +1,18 @@
 import { test, expect } from "@playwright/test";
 
-test('User can log in with valid credentials and is redirected to product catalog', async ({ page }) => {
-  
-    // Given I am on the login page
-  await page.goto('https://www.saucedemo.com/');
 
-  // When I enter valid credentials
-  await page.fill('[data-test="username"]', 'standard_user');
-  await page.fill('[data-test="password"]', 'secret_sauce');
+const BASE_URL = 'https://www.saucedemo.com';
+const STANDARD_USER = 'standard_user';
+const STANDARD_PASSWORD = 'secret_sauce';
 
-  // And I click the "Login" button
+async function login(page, username = STANDARD_USER, password = STANDARD_PASSWORD) {
+  await page.goto(`${BASE_URL}/`);
+  await page.fill('[data-test="username"]', username);
+  await page.fill('[data-test="password"]', password);
   await page.click('[data-test="login-button"]');
+  await expect(page).toHaveURL(`${BASE_URL}/inventory.html`);
+}
 
-  // Then I should be redirected to the product catalog page
-  await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+test('User can log in with valid credentials and is redirected to product catalog', async ({ page }) => {
+  await login(page);
 });
