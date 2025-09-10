@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-
 const BASE_URL = 'https://www.saucedemo.com';
 const STANDARD_USER = 'standard_user';
 const STANDARD_PASSWORD = 'secret_sauce';
@@ -13,10 +12,14 @@ async function login(page, username = STANDARD_USER, password = STANDARD_PASSWOR
   await expect(page).toHaveURL(`${BASE_URL}/inventory.html`);
 }
 
+// Test: User can log in with valid credentials and is redirected to product catalog
+// This test verifies that a user can successfully log in and is taken to the inventory page.
 test('User can log in with valid credentials and is redirected to product catalog', async ({ page }) => {
   await login(page);
 });
 
+// Test: User can add an item to the cart and see the cart count update
+// This test checks that adding an item to the cart updates the cart badge and the item appears in the cart.
 test('User can add an item to the cart and see the cart count update', async ({ page }) => {
   await login(page);
   // Add Sauce Labs Backpack to cart
@@ -31,6 +34,8 @@ test('User can add an item to the cart and see the cart count update', async ({ 
   await expect(page.locator('.cart_item')).toContainText('Sauce Labs Backpack');
 });
 
+// Test: User can proceed to checkout from cart page
+// This test ensures that the user can navigate from the cart page to the checkout page.
 test('User can proceed to checkout from cart page', async ({ page }) => {
   await login(page);
   await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
@@ -41,6 +46,8 @@ test('User can proceed to checkout from cart page', async ({ page }) => {
   await expect(page).toHaveURL(`${BASE_URL}/checkout-step-one.html`);
 });
 
+// Test: User can enter shipping info and proceed to overview
+// This test verifies that the user can enter shipping information and move to the order overview page.
 test('User can enter shipping info and proceed to overview', async ({ page }) => {
   await login(page);
   await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
@@ -54,6 +61,9 @@ test('User can enter shipping info and proceed to overview', async ({ page }) =>
   await page.click('[data-test="continue"]');
   await expect(page).toHaveURL(`${BASE_URL}/checkout-step-two.html`);
 });
+
+// Test: User can finish checkout and see confirmation
+// This test confirms that the user can complete the checkout process and sees the order confirmation message.
 test('User can finish checkout and see confirmation', async ({ page }) => {
   await login(page);
   await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
