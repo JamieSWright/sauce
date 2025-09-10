@@ -54,3 +54,19 @@ test('User can enter shipping info and proceed to overview', async ({ page }) =>
   await page.click('[data-test="continue"]');
   await expect(page).toHaveURL(`${BASE_URL}/checkout-step-two.html`);
 });
+test('User can finish checkout and see confirmation', async ({ page }) => {
+  await login(page);
+  await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
+  await page.click('.shopping_cart_link');
+  await page.click('[data-test="checkout"]');
+  await page.fill('[data-test="firstName"]', 'John');
+  await page.fill('[data-test="lastName"]', 'Doe');
+  await page.fill('[data-test="postalCode"]', '12345');
+  await page.click('[data-test="continue"]');
+  await expect(page).toHaveURL(`${BASE_URL}/checkout-step-two.html`);
+  // Review and finish
+  await page.click('[data-test="finish"]');
+  await expect(page).toHaveURL(`${BASE_URL}/checkout-complete.html`);
+  // The confirmation text is hardcoded as per current UI; update this value if the UI changes.
+  await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+});
