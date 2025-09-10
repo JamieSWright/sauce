@@ -16,6 +16,7 @@ async function login(page, username = STANDARD_USER, password = STANDARD_PASSWOR
 test('User can log in with valid credentials and is redirected to product catalog', async ({ page }) => {
   await login(page);
 });
+
 test('User can add an item to the cart and see the cart count update', async ({ page }) => {
   await login(page);
   // Add Sauce Labs Backpack to cart
@@ -28,4 +29,14 @@ test('User can add an item to the cart and see the cart count update', async ({ 
   await expect(page).toHaveURL(`${BASE_URL}/cart.html`);
   // Item should be listed in cart
   await expect(page.locator('.cart_item')).toContainText('Sauce Labs Backpack');
+});
+
+test('User can proceed to checkout from cart page', async ({ page }) => {
+  await login(page);
+  await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
+  await page.click('.shopping_cart_link');
+  await expect(page).toHaveURL(`${BASE_URL}/cart.html`);
+  // Click Checkout
+  await page.click('[data-test="checkout"]');
+  await expect(page).toHaveURL(`${BASE_URL}/checkout-step-one.html`);
 });
