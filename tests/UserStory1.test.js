@@ -16,3 +16,16 @@ async function login(page, username = STANDARD_USER, password = STANDARD_PASSWOR
 test('User can log in with valid credentials and is redirected to product catalog', async ({ page }) => {
   await login(page);
 });
+test('User can add an item to the cart and see the cart count update', async ({ page }) => {
+  await login(page);
+  // Add Sauce Labs Backpack to cart
+  await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
+  // Cart icon should show 1
+  const cartBadge = page.locator('.shopping_cart_badge');
+  await expect(cartBadge).toHaveText('1');
+  // Click cart icon
+  await page.click('.shopping_cart_link');
+  await expect(page).toHaveURL(`${BASE_URL}/cart.html`);
+  // Item should be listed in cart
+  await expect(page.locator('.cart_item')).toContainText('Sauce Labs Backpack');
+});
