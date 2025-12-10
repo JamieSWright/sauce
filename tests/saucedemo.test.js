@@ -16,6 +16,31 @@ test('User can log in with valid credentials and is redirected to product catalo
   await login(page);
 });
 
+// This test verifies that login fails with an invalid username and shows an error message.
+test('User cannot log in with invalid username', async ({ page }) => {
+  await page.goto(BASE_URL);
+  await page.fill('[data-test="username"]', 'invalid_user');
+  await page.fill('[data-test="password"]', STANDARD_PASSWORD);
+  await page.click('[data-test="login-button"]');
+  
+  // Should show error message and remain on login page
+  await expect(page.locator('[data-test="error"]')).toBeVisible();
+  await expect(page.locator('[data-test="error"]')).toContainText('Username and password do not match');
+  await expect(page).toHaveURL(BASE_URL);
+});
+
+// This test verifies that login fails with an invalid password and shows an error message.
+test('User cannot log in with invalid password', async ({ page }) => {
+  await page.goto(BASE_URL);
+  await page.fill('[data-test="username"]', STANDARD_USER);
+  await page.fill('[data-test="password"]', 'wrong_password');
+  await page.click('[data-test="login-button"]');
+  
+  await expect(page.locator('[data-test="error"]')).toBeVisible();
+  await expect(page.locator('[data-test="error"]')).toContainText('Username and password do not match');
+  await expect(page).toHaveURL(BASE_URL);
+});
+
 // This test checks that adding an item to the cart updates the cart badge and the item appears in the cart.
 test('User can add an item to the cart and see the cart count update', async ({ page }) => {
   await login(page);

@@ -9,6 +9,8 @@ Playwright end-to-end tests for the "saucedemo" web application. It verifies key
 
 ## Test Summaries
 
+### Positive Tests
+
 - **User can log in with valid credentials and is redirected to product catalog**  
   Verifies that a user can successfully log in and is taken to the inventory page.
 
@@ -23,6 +25,14 @@ Playwright end-to-end tests for the "saucedemo" web application. It verifies key
 
 - **User can finish checkout and see confirmation**  
   Confirms that the user can complete the checkout process and sees the order confirmation message.
+
+### Negative Tests
+
+- **User cannot log in with invalid username**  
+  Verifies that login fails with an invalid username and shows an error message.
+
+- **User cannot log in with invalid password**  
+  Verifies that login fails with an invalid password and shows an error message.
 
   ## How to Run the Test
 1. Install dependencies:
