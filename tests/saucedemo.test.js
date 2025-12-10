@@ -12,12 +12,12 @@ async function login(page, username = STANDARD_USER, password = STANDARD_PASSWOR
   await page.waitForURL(`${BASE_URL}/inventory.html`);
 }
 // This test verifies that a user can successfully log in and is taken to the inventory page.
-test('User can log in with valid credentials and is redirected to product catalog', async ({ page }) => {
+test('should log in successfully with valid credentials', async ({ page }) => {
   await login(page);
 });
 
 // This test verifies that login fails with an invalid username and shows an error message.
-test('User cannot log in with invalid username', async ({ page }) => {
+test('should reject login with invalid username', async ({ page }) => {
   await page.goto(BASE_URL);
   await page.fill('[data-test="username"]', 'invalid_user');
   await page.fill('[data-test="password"]', STANDARD_PASSWORD);
@@ -30,7 +30,7 @@ test('User cannot log in with invalid username', async ({ page }) => {
 });
 
 // This test verifies that login fails with an invalid password and shows an error message.
-test('User cannot log in with invalid password', async ({ page }) => {
+test('should reject login with invalid password', async ({ page }) => {
   await page.goto(BASE_URL);
   await page.fill('[data-test="username"]', STANDARD_USER);
   await page.fill('[data-test="password"]', 'wrong_password');
@@ -42,7 +42,7 @@ test('User cannot log in with invalid password', async ({ page }) => {
 });
 
 // This test checks that adding an item to the cart updates the cart badge and the item appears in the cart.
-test('User can add an item to the cart and see the cart count update', async ({ page }) => {
+test('should add item to cart and update badge count', async ({ page }) => {
   await login(page);
   // Add Sauce Labs Backpack to cart
   await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
@@ -57,7 +57,7 @@ test('User can add an item to the cart and see the cart count update', async ({ 
 });
 
 // This test ensures that the user can navigate from the cart page to the checkout page.
-test('User can proceed to checkout from cart page', async ({ page }) => {
+test('should navigate from cart to checkout', async ({ page }) => {
   await login(page);
   await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
   await page.click('.shopping_cart_link');
@@ -68,7 +68,7 @@ test('User can proceed to checkout from cart page', async ({ page }) => {
 });
 
 // This test verifies that the user can enter shipping information and move to the order overview page.
-test('User can enter shipping info and proceed to overview', async ({ page }) => {
+test('should complete shipping info and reach overview', async ({ page }) => {
   await login(page);
   await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
   await page.click('.shopping_cart_link');
@@ -83,7 +83,7 @@ test('User can enter shipping info and proceed to overview', async ({ page }) =>
 });
 
 // This test confirms that the user can complete the checkout process and sees the order confirmation message.
-test('User can finish checkout and see confirmation', async ({ page }) => {
+test('should complete checkout with confirmation', async ({ page }) => {
   await login(page);
   await page.click('[data-test="add-to-cart-sauce-labs-backpack"]');
   await page.click('.shopping_cart_link');
