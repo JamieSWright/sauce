@@ -1,9 +1,16 @@
 import { test, expect } from "@playwright/test";
 
+
+// you can set a base URL in the playwright.config.js file too, but including here, especially if you want to run against different urls with different classes is not a bad thing
 const BASE_URL = 'https://www.saucedemo.com';
+
+// we shouln't hardcode credentials in tests, especially if they get shared, so we'll implement these in an env file locally, which is then added to the gitignore file to avoid them being shared to a repo
 const STANDARD_USER = 'standard_user';
 const STANDARD_PASSWORD = 'secret_sauce';
 
+
+// the biggest benefit change we can make early on is to implement a page object model so yo do't have to keep finding selectors on every step. If data-test="username" ever changed it would be a nightmre to update all tests. Instead we can just update the page object file
+// the other benefit we can get from a POM is to implement common functions like adding login details there and reuse them across multiple tests
 async function login(page, username = STANDARD_USER, password = STANDARD_PASSWORD) {
   await page.goto(BASE_URL);
   await page.fill('[data-test="username"]', username);
