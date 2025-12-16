@@ -50,7 +50,6 @@ npx playwright test
 
 **Run specific test file:**
 ```sh
-npx playwright test tests/saucedemo.test.js
 npx playwright test tests/tests/loginpage.spec.ts
 ```
 
@@ -112,10 +111,22 @@ npx playwright show-report
 - `expectToBeOnInventoryPage()` - URL verification
 
 ### CartPage
-- Cart operations and checkout navigation
+- `goto()` - Navigates to cart page
+- `clickCartLink()` - Clicks cart icon
+- `getCartBadgeCount()` - Returns cart badge count
+- `isCartBadgeVisible()` - Checks cart badge visibility
+- `expectCartBadgeCount(count)` - Validates cart badge count
+- `isItemInCart(itemName)` - Checks if item exists in cart
+- `expectItemInCart(itemName)` - Validates item is in cart
+- `clickCheckout()` - Proceeds to checkout
 
 ### CheckoutPage
-- Checkout form submission and order completion
+- `gotoStepOne()` - Navigates to checkout step one
+- `gotoStepTwo()` - Navigates to checkout step two
+- `gotoComplete()` - Navigates to checkout complete page
+- Form field methods (in development)
+- Button click methods (in development)
+- Assertion methods (in development)
 
 ## Configuration
 
