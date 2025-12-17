@@ -1,13 +1,74 @@
-# sauce
-Playwright end-to-end tests for the "saucedemo" web application. It verifies key user flows: logging in, adding an item to the cart, proceeding to checkout, entering shipping information, and completing a purchase with confirmation. Each test simulates a typical user action and checks the expected outcome.
+# Sauce Demo - Playwright Test Suite
 
+End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using Playwright with TypeScript. This project implements the Page Object Model (POM) pattern to test key e-commerce workflows including authentication, shopping cart operations, and checkout processes.
+
+## Project Structure
+
+```
+tests/
+├── pages/              # Page Object Model classes
+│   ├── loginpage.ts    # Login page interactions
+│   ├── inventorypage.ts # Product catalog page
+│   ├── cartpage.ts     # Shopping cart page
+│   └── checkoutpage.ts # Checkout flow pages
+├── tests/              # Test specifications
+│   └── loginpage.spec.ts
+└── saucedemo.test.js   # Legacy test file
+```
 
 ## Requirements
-- Node.js v18+
-- Playwright
 
+- **Node.js** v18 or higher
+- **Playwright** v1.54.1 or higher
+- **TypeScript** (included as dev dependency)
 
-## Test Summaries
+## Setup
+
+1. **Install dependencies:**
+   ```sh
+   npm install
+   ```
+
+2. **Install Playwright browsers:**
+   ```sh
+   npx playwright install
+   ```
+
+3. **Environment variables (optional):**
+   Create a `.env` file for credentials:
+   ```
+   STANDARD_USERNAME=standard_user
+   PASSWORD=secret_sauce
+   ```
+
+## Running Tests
+
+**Run all tests:**
+```sh
+npx playwright test
+```
+
+**Run specific test file:**
+```sh
+npx playwright test tests/tests/loginpage.spec.ts
+```
+
+**Run tests in headed mode:**
+```sh
+npx playwright test --headed
+```
+
+**Run tests with UI:**
+```sh
+npx playwright test --ui
+```
+
+**View test report:**
+```sh
+npx playwright show-report
+```
+
+## Test Coverage
 
 ### Positive Tests
 
@@ -34,22 +95,62 @@ Playwright end-to-end tests for the "saucedemo" web application. It verifies key
 - **User cannot log in with invalid password**  
   Verifies that login fails with an invalid password and shows an error message.
 
-  ## How to Run the Test
-1. Install dependencies:
-   ```sh
-   npm install
-   ```
-2. Run the test:
-   ```sh
-   npx playwright test tests/saucedemo.test.js
-   ```
+## Page Object Classes
 
-> **Note:** 
-For consistency, use the latest stable version of Playwright by running:
-> ```sh
-> npm install -D playwright@latest
-> ```
+### LoginPage
+- `login(username, password)` - Performs login
+- `expectErrorMessage(message)` - Validates error messages
+- `expectToBeOnLoginPage()` - URL verification
 
+### InventoryPage
+- `addItemToCart(itemName)` - Adds product to cart
+- `removeItemFromCart(itemName)` - Removes product from cart
+- `getCartBadgeCount()` - Returns cart item count
+- `expectCartBadgeCount(count)` - Validates cart badge
+- `clickCartLink()` - Navigates to cart
+- `expectToBeOnInventoryPage()` - URL verification
+
+### CartPage
+- `goto()` - Navigates to cart page
+- `clickCartLink()` - Clicks cart icon
+- `getCartBadgeCount()` - Returns cart badge count
+- `isCartBadgeVisible()` - Checks cart badge visibility
+- `expectCartBadgeCount(count)` - Validates cart badge count
+- `isItemInCart(itemName)` - Checks if item exists in cart
+- `expectItemInCart(itemName)` - Validates item is in cart
+- `clickCheckout()` - Proceeds to checkout
+
+### CheckoutPage
+- `gotoStepOne()` - Navigates to checkout step one
+- `gotoStepTwo()` - Navigates to checkout step two
+- `gotoComplete()` - Navigates to checkout complete page
+- Form field methods (in development)
+- Button click methods (in development)
+- Assertion methods (in development)
+
+## Configuration
+
+Tests are configured in [playwright.config.ts](playwright.config.ts). Default settings include:
+- Multiple browser support (Chromium, Firefox, WebKit)
+- Parallel test execution
+- Automatic screenshots on failure
+- HTML test reports
+
+## Best Practices
+
+- **Page Object Model**: All page interactions are encapsulated in page classes
+- **TypeScript**: Strong typing for better IDE support and error detection
+- **Async/Await**: Proper promise handling throughout
+- **Selectors**: Uses data-test attributes for reliable element selection
+- **Environment Variables**: Sensitive data stored in `.env` files
+
+## Upgrading Playwright
+
+To use the latest stable version:
+```sh
+npm install -D @playwright/test@latest
+npx playwright install
+```
 
 ## Notes
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⠀⠀⠀⢀⡤⠤⠤⣄⠀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
