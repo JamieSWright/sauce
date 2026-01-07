@@ -17,8 +17,9 @@ test.describe('Login Page Tests', () => {
     await page.close();
   });
 
-  test('Successful login with valid credentials', async () => {
-    await loginPage.login(process.env.STANDARD_USERNAME || '', process.env.PASSWORD || '');
+ test('Successful login with valid credentials', async () => {
+    await loginPage.goto();
+    await loginPage.login(process.env.STANDARD_USERNAME || 'standard_user', process.env.PASSWORD || 'secret_sauce');
     await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
   });
 
