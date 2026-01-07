@@ -1,25 +1,45 @@
-# Sauce Demo - Playwright Test Suite
+# Sauce Demo - Test Automation Suite
 
-End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using Playwright with TypeScript. This project implements the Page Object Model (POM) pattern to test key e-commerce workflows including authentication, shopping cart operations, and checkout processes.
+End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using **Playwright** and **Cucumber BDD** with TypeScript. This project implements the Page Object Model (POM) pattern to test key e-commerce workflows including authentication, shopping cart operations, and checkout processes.
 
 ## Project Structure
 
 ```
-tests/
-├── pages/              # Page Object Model classes
-│   ├── loginpage.ts    # Login page interactions
-│   ├── inventorypage.ts # Product catalog page
-│   ├── cartpage.ts     # Shopping cart page
-│   └── checkoutpage.ts # Checkout flow pages
-├── tests/              # Test specifications
-│   └── loginpage.spec.ts
-└── saucedemo.test.js   # Legacy test file
+├── features/                    # Cucumber BDD feature files
+│   ├── login.feature            # Login scenarios
+│   ├── cart.feature             # Shopping cart scenarios
+│   ├── checkout.feature         # Checkout process scenarios
+│   ├── inventory.feature        # Product inventory scenarios
+│   └── step-definitions/        # Step implementations
+│       ├── common.steps.ts      # Shared hooks and setup
+│       ├── login.steps.ts       # Login step definitions
+│       ├── cart.steps.ts        # Cart step definitions
+│       ├── checkout.steps.ts    # Checkout step definitions
+│       ├── inventory.steps.ts   # Inventory step definitions
+│       └── helpers.ts           # Helper functions
+├── tests/
+│   ├── pages/                   # Page Object Model classes
+│   │   ├── loginpage.ts         # Login page interactions
+│   │   ├── inventorypage.ts     # Product catalog page
+│   │   ├── cartpage.ts          # Shopping cart page
+│   │   └── checkoutpage.ts      # Checkout flow pages
+│   └── tests/                   # Playwright test specifications
+│       ├── loginpage.spec.ts
+│       ├── cartpage.spec.ts
+│       └── checkoutpage.spec.ts
+├── test-results/                # Test reports and artifacts
+│   ├── screenshots/             # Failure screenshots
+│   └── videos/                  # Test recordings
+├── cucumber.js                  # Cucumber configuration
+├── playwright.config.ts         # Playwright configuration
+└── tsconfig.json               # TypeScript configuration
 ```
 
 ## Requirements
 
 - **Node.js** v18 or higher
 - **Playwright** v1.54.1 or higher
+- **Cucumber** v7.3.2
 - **TypeScript** (included as dev dependency)
 
 ## Setup
@@ -34,18 +54,34 @@ tests/
    npx playwright install
    ```
 
-3. **Environment variables (optional):**
-   Create a `.env` file for credentials:
+3. **Environment variables:**
+   Create a `.env` file based on `.env.example`:
+   ```sh
+   cp .env.example .env
    ```
+   
+   Configure your settings in `.env`:
+   ```env
+   # Browser Settings
+   HEADLESS=false
+   SLOW_MO=100
+   RECORD_VIDEO=false
+   
+   # Test Credentials
    STANDARD_USERNAME=standard_user
    PASSWORD=secret_sauce
+   
+   # Base URL
+   BASE_URL=https://www.saucedemo.com
    ```
 
 ## Running Tests
 
-**Run all tests:**
+### Playwright Tests
+
+**Run all Playwright tests:**
 ```sh
-npx playwright test
+npm run test:playwright
 ```
 
 **Run specific test file:**
@@ -63,108 +99,195 @@ npx playwright test --headed
 npx playwright test --ui
 ```
 
-**View test report:**
+**View Playwright report:**
 ```sh
 npx playwright show-report
 ```
 
+### Cucumber BDD Tests
+
+**Run all Cucumber tests:**
+```sh
+npm run test:cucumber
+```
+
+**Run in headless mode (for CI/CD):**
+```sh
+npm run test:cucumber:headless
+```
+
+**Run specific feature:**
+```sh
+npm run test:cucumber:login
+```
+
+**Run all tests (Playwright + Cucumber):**
+```sh
+npm run test:all
+```
+
+### Utility Commands
+
+**Clean test artifacts:**
+```sh
+npm run clean
+```
+
 ## Test Coverage
 
-### Positive Tests
+### Cucumber BDD Feature Files
 
-- **User can log in with valid credentials and is redirected to product catalog**  
-  Verifies that a user can successfully log in and is taken to the inventory page.
+#### Login Feature (`features/login.feature`)
+- ✅ Successful login with valid credentials
+- ❌ Unsuccessful login with invalid credentials
 
-- **User can add an item to the cart and see the cart count update**  
-  Checks that adding an item to the cart updates the cart badge and the item appears in the cart.
+#### Shopping Cart Feature (`features/cart.feature`)
+- ✅ Add item to cart and verify badge count
+- ✅ Navigate from cart to checkout
 
-- **User can proceed to checkout from cart page**  
-  Ensures that the user can navigate from the cart page to the checkout page.
+#### Checkout Feature (`features/checkout.feature`)
+- ✅ Complete shipping information
+- ✅ Complete full checkout with order confirmation
 
-- **User can enter shipping info and proceed to overview**  
-  Verifies that the user can enter shipping information and move to the order overview page.
+#### Inventory Feature (`features/inventory.feature`)
+- ✅ View inventory items
+- ✅ Add multiple items to cart
 
-- **User can finish checkout and see confirmation**  
-  Confirms that the user can complete the checkout process and sees the order confirmation message.
+### Playwright Test Specifications
 
-### Negative Tests
+#### Login Tests (`tests/tests/loginpage.spec.ts`)
+- ✅ Successful login with valid credentials
+- ❌ Unsuccessful login with invalid credentials
 
-- **User cannot log in with invalid username**  
-  Verifies that login fails with an invalid username and shows an error message.
+#### Cart Tests (`tests/tests/cartpage.spec.ts`)
+- ✅ Add item to cart and update badge count
+- ✅ Navigate from cart to checkout
 
-- **User cannot log in with invalid password**  
-  Verifies that login fails with an invalid password and shows an error message.
+#### Checkout Tests (`tests/tests/checkoutpage.spec.ts`)
+- ✅ Complete shipping info and reach overview
+- ✅ Complete checkout with confirmation
 
-## Page Object Classes
+## Architecture
 
-### LoginPage
-- `login(username, password)` - Performs login
-- `expectErrorMessage(message)` - Validates error messages
+### Page Object Model (POM)
+
+All page interactions are abstracted into reusable page objects located in `tests/pages/`. Both Playwright and Cucumber tests utilize the same page objects for consistency.
+
+#### LoginPage (`tests/pages/loginpage.ts`)
+- `goto()` - Navigate to login page
+- `login(username, password)` - Perform login
+- `fillUsername(username)` - Fill username field
+- `fillPassword(password)` - Fill password field
+- `clickLogin()` - Click login button
+- `expectErrorMessage(message)` - Validate error messages
 - `expectToBeOnLoginPage()` - URL verification
+- `expectToBeOnInventoryPage()` - Verify successful login
 
-### InventoryPage
-- `addItemToCart(itemName)` - Adds product to cart
-- `removeItemFromCart(itemName)` - Removes product from cart
-- `getCartBadgeCount()` - Returns cart item count
-- `expectCartBadgeCount(count)` - Validates cart badge
-- `clickCartLink()` - Navigates to cart
+#### InventoryPage (`tests/pages/inventorypage.ts`)
+- `addItemToCart(itemId)` - Add product to cart
+- `removeItemFromCart(itemId)` - Remove product from cart
+- `getCartBadgeCount()` - Get cart item count
+- `expectCartBadgeCount(count)` - Validate cart badge
 - `expectToBeOnInventoryPage()` - URL verification
 
-### CartPage
-- `goto()` - Navigates to cart page
-- `clickCartLink()` - Clicks cart icon
-- `getCartBadgeCount()` - Returns cart badge count
-- `isCartBadgeVisible()` - Checks cart badge visibility
-- `expectCartBadgeCount(count)` - Validates cart badge count
-- `isItemInCart(itemName)` - Checks if item exists in cart
-- `expectItemInCart(itemName)` - Validates item is in cart
-- `clickCheckout()` - Proceeds to checkout
+#### CartPage (`tests/pages/cartpage.ts`)
+- `goto()` - Navigate to cart page
+- `clickCartLink()` - Click cart icon
+- `clickCheckout()` - Proceed to checkout
+- `expectItemInCart(itemName)` - Verify item in cart
+- `expectToBeOnCartPage()` - URL verification
+- `getCartBadgeCount()` - Get cart badge count
 
-### CheckoutPage
-- `gotoStepOne()` - Navigates to checkout step one
-- `gotoStepTwo()` - Navigates to checkout step two
-- `gotoComplete()` - Navigates to checkout complete page
-- Form field methods (in development)
-- Button click methods (in development)
-- Assertion methods (in development)
+#### CheckoutPage (`tests/pages/checkoutpage.ts`)
+- `fillShippingInfo(firstName, lastName, postalCode)` - Enter shipping details
+- `clickContinue()` - Continue to next step
+- `clickFinish()` - Complete checkout
+- `expectToBeOnStepOne()` - Verify checkout step one
+- `expectToBeOnStepTwo()` - Verify checkout overview
+- `expectToBeOnComplete()` - Verify order confirmation
+- `expectCompleteHeader(message)` - Validate confirmation message
+
+### Cucumber Step Definitions
+
+Step definitions are located in `features/step-definitions/` and map Gherkin steps to page object methods.
+
+- **common.steps.ts** - Browser lifecycle, World configuration, screenshot on failure
+- **login.steps.ts** - Login-related steps
+- **cart.steps.ts** - Shopping cart steps
+- **checkout.steps.ts** - Checkout process steps
+- **inventory.steps.ts** - Product inventory steps
+- **helpers.ts** - Reusable utility functions
 
 ## Configuration
 
-Tests are configured in [playwright.config.ts](playwright.config.ts). Default settings include:
-- Multiple browser support (Chromium, Firefox, WebKit)
-- Parallel test execution
-- Automatic screenshots on failure
-- HTML test reports
+### Cucumber Configuration (`cucumber.js`)
+
+Multiple profiles are available:
+- **default** - Standard test execution with HTML/JSON reports
+- **headless** - CI/CD optimized with parallel execution
+- **login** - Run only login feature tests
+
+### Playwright Configuration (`playwright.config.ts`)
+
+Configured for:
+- Chromium browser testing
+- HTML reporting
+- Trace on first retry
+- Environment variable support
+
+### TypeScript Configuration (`tsconfig.json`)
+
+Set up for:
+- CommonJS module resolution
+- ES2020 target
+- Cucumber and Node type support
+
+## Test Reports
+
+### Cucumber Reports
+- **HTML Report**: `test-results/cucumber-report.html`
+- **JSON Report**: `test-results/cucumber-report.json`
+
+### Playwright Reports
+- **HTML Report**: `playwright-report/index.html`
+
+### Artifacts
+- **Screenshots**: `test-results/screenshots/` (captured on failure)
+- **Videos**: `test-results/videos/` (when enabled)
 
 ## Best Practices
 
-- **Page Object Model**: All page interactions are encapsulated in page classes
-- **TypeScript**: Strong typing for better IDE support and error detection
-- **Async/Await**: Proper promise handling throughout
-- **Selectors**: Uses data-test attributes for reliable element selection
-- **Environment Variables**: Sensitive data stored in `.env` files
+1. **Page Objects** - All page interactions should be in page object classes
+2. **Reusable Steps** - Common Cucumber steps are shared across features
+3. **Environment Variables** - Never commit `.env` file with credentials
+4. **Screenshots** - Automatically captured on test failures
+5. **DRY Principle** - Helper functions reduce code duplication
 
-## Upgrading Playwright
+## CI/CD Integration
 
-To use the latest stable version:
+Run tests in headless mode:
+```sh
+HEADLESS=true npm run test:cucumber
+```
+
+Clean before running in CI:
+```sh
+npm run clean && npm run test:all
+```
+
+## Upgrading Dependencies
+
+**Update Playwright:**
 ```sh
 npm install -D @playwright/test@latest
 npx playwright install
 ```
 
-## Notes
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⠀⠀⠀⢀⡤⠤⠤⣄⠀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⠤⢴⣴⠒⠉⠹⣴⣏⠀⠀⠀⡀⠈⢇⠀⠀⣼⠀⠀⠀⠘⣶⠇⠀⢨⢃⡾⠓⠲⢤⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⣀⠤⠔⠒⠙⣯⣇⠀⠈⣿⣇⠀⠀⣿⣿⣿⠀⠀⣷⠀⠘⡄⠀⣿⠀⠀⠀⠀⢹⠀⠀⢸⡏⠇⠀⢀⠇⣀⠤⠒⠒⠤⣄
-⢰⡖⠉⠀⠀⠀⠀⣀⣸⣿⠀⠀⠉⠉⠀⠀⢸⠁⣿⠀⠈⠉⠁⠀⢱⠀⣿⠀⠀⣦⠀⠀⠀⠀⣿⡸⠀⠀⠘⠉⠀⠀⣀⣤⣴⠟
-⢼⢣⣀⣴⡀⠀⠘⡿⠏⠗⡆⠀⠠⣶⡆⠀⠸⡄⡏⠀⠀⣶⣷⠀⠀⢧⣿⠀⠀⣿⡆⠀⠀⢸⣿⠃⠀⢰⡄⠀⠐⡿⠛⠋⠀⠀
-⠘⢿⡿⢿⣧⠀⠀⢳⠀⢸⠸⠀⠀⢹⣧⢀⣀⣷⣧⣤⣤⠛⣏⣦⣤⣾⣿⢦⣤⣿⢸⣄⣀⣼⡏⠀⢠⡟⡇⠀⠀⡇⠀⠀⠀⠀
-⠀⠀⠀⠀⢏⢇⠀⠀⣣⠀⣆⣷⣶⣿⣿⡿⠿⠿⢷⡿⠟⣠⠟⠋⠛⢿⡛⠛⠿⡼⠿⠿⢿⣿⣿⣶⠞⡅⢸⠀⠀⢸⠀⠀⠀⠀
-⠀⠀⠀⠀⠘⣾⣿⣿⠇⢠⣟⠉⠙⠷⡿⠀⠀⠀⢸⢀⡼⠁⠀⣀⠀⠀⠹⡄⡼⡇⠀⠀⡜⣸⡏⠙⠢⣧⣾⣦⣀⢸⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠈⠀⠀⠀⢿⣿⣷⣦⡀⠀⠀⠀⠀⣇⡾⠀⠀⣼⣿⢷⠀⠀⢻⢱⠀⠀⢀⣿⡿⠀⠀⢠⠋⢻⡿⠿⣏⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⣿⣿⠆⠀⠀⢸⡏⡇⠀⠀⡏⡟⡟⠀⠀⢸⡸⠀⠀⢸⣿⠃⠀⠀⡜⡰⢩⠃⠀⠈⣱⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⢹⠀⠀⠀⢸⠀⡇⠀⠀⠙⠋⠀⠀⢀⡏⡇⠀⠀⠘⠋⠀⠀⣰⣱⢣⠇⠀⠀⣰⠃⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡘⡎⠀⠀⠀⡏⣿⣧⡀⠀⠀⠀⠀⢀⣾⣷⡇⠀⠀⠀⠀⠀⢠⣯⣧⣾⣦⣄⣰⠃⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⣧⣤⣶⣶⠃⠘⢿⣿⣷⣶⣶⣾⠟⠉⣿⣿⣦⣄⣀⣠⣴⢏⣽⠋⠉⠙⢿⠁⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠛⠛⠛⠋⠁⠀⠀⠀⠉⠉⠉⠉⠀⠀⠀⠈⠛⠻⠿⠟⠋⠁⣿⣿⣦⣀⣀⡼⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀
+**Update Cucumber:**
+```sh
+npm install @cucumber/cucumber@latest
+```
+
+## License
+
+MIT
