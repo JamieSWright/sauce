@@ -2,6 +2,27 @@
 
 End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using **Playwright** and **Cucumber BDD** with TypeScript. This project implements the Page Object Model (POM) pattern to test key e-commerce workflows including authentication, shopping cart operations, and checkout processes.
 
+## ⚠️ Prerequisites
+
+**Critical Requirements:**
+- **Node.js v18 or higher** (v16 is not supported by Playwright)
+- npm or yarn package manager
+
+**Verify your Node.js version:**
+```sh
+node --version  # Must be v18.x.x or higher
+```
+
+**If you need to upgrade Node.js:**
+```sh
+# Using nvm (recommended)
+nvm install 18
+nvm use 18
+nvm alias default 18
+
+# Or download from https://nodejs.org
+```
+
 ## Project Structure
 
 ```
@@ -23,13 +44,18 @@ End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using **Pl
 │   │   ├── inventorypage.ts     # Product catalog page
 │   │   ├── cartpage.ts          # Shopping cart page
 │   │   └── checkoutpage.ts      # Checkout flow pages
+│   ├── steps/                   # Additional step definitions (optional)
 │   └── tests/                   # Playwright test specifications
 │       ├── loginpage.spec.ts
 │       ├── cartpage.spec.ts
 │       └── checkoutpage.spec.ts
+├── .vscode/                     # VS Code workspace settings
+│   └── settings.json            # Cucumber autocomplete configuration
 ├── test-results/                # Test reports and artifacts
 │   ├── screenshots/             # Failure screenshots
 │   └── videos/                  # Test recordings
+├── .env.example                 # Environment variable template
+├── .gitignore                   # Git ignore rules
 ├── cucumber.js                  # Cucumber configuration
 ├── playwright.config.ts         # Playwright configuration
 └── tsconfig.json               # TypeScript configuration
@@ -37,24 +63,31 @@ End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using **Pl
 
 ## Requirements
 
-- **Node.js** v18 or higher
+- **Node.js** v18 or higher ⚠️ **REQUIRED**
+- **npm** v8 or higher (comes with Node.js)
 - **Playwright** v1.54.1 or higher
 - **Cucumber** v7.3.2
 - **TypeScript** (included as dev dependency)
 
 ## Setup
 
-1. **Install dependencies:**
+1. **Verify Node.js version:**
+   ```sh
+   node --version  # Must show v18.x.x or higher
+   ```
+   If you're running Node.js v16 or lower, you **must upgrade** before proceeding.
+
+2. **Install dependencies:**
    ```sh
    npm install
    ```
 
-2. **Install Playwright browsers:**
+3. **Install Playwright browsers:**
    ```sh
-   npx playwright install
+   npx playwright install chromium
    ```
 
-3. **Environment variables:**
+4. **Environment variables:**
    Create a `.env` file based on `.env.example`:
    ```sh
    cp .env.example .env
@@ -73,7 +106,12 @@ End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using **Pl
    
    # Base URL
    BASE_URL=https://www.saucedemo.com
+   
+   # Screenshot Settings
+   SCREENSHOT_ON_FAILURE=true
    ```
+   
+   **⚠️ Important:** Never commit your `.env` file - it's already in `.gitignore`
 
 ## Running Tests
 
@@ -255,24 +293,24 @@ Set up for:
 - **Screenshots**: `test-results/screenshots/` (captured on failure)
 - **Videos**: `test-results/videos/` (when enabled)
 
-## Best Practices
 
-1. **Page Objects** - All page interactions should be in page object classes
-2. **Reusable Steps** - Common Cucumber steps are shared across features
-3. **Environment Variables** - Never commit `.env` file with credentials
-4. **Screenshots** - Automatically captured on test failures
-5. **DRY Principle** - Helper functions reduce code duplication
-
-## CI/CD Integration
-
-Run tests in headless mode:
+**Run tests in headless mode:**
 ```sh
 HEADLESS=true npm run test:cucumber
 ```
 
-Clean before running in CI:
+**Clean before running in CI:**
 ```sh
 npm run clean && npm run test:all
+```
+
+**Environment-specific configuration:**
+```sh
+# CI environment
+export CI=true
+export HEADLESS=true
+export RECORD_VIDEO=false
+npm run test:all
 ```
 
 ## Upgrading Dependencies
@@ -288,6 +326,3 @@ npx playwright install
 npm install @cucumber/cucumber@latest
 ```
 
-## License
-
-MIT
