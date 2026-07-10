@@ -18,3 +18,12 @@ Feature: User Login
     And I click the login button
     Then I should see an error message "Epic sadface: Username and password do not match any user in this service"
     And I should remain on the login page
+
+  Scenario: Validate API user endpoint before UI login
+    When I send a GET request to "/users/2"
+    Then the API response status should be 200
+    And the API response field "data.id" should be 2
+    When I enter username "standard_user"
+    And I enter password "secret_sauce"
+    And I click the login button
+    Then I should be redirected to the inventory page

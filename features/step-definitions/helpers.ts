@@ -17,3 +17,20 @@ export async function loginAsStandardUser(world: CustomWorld): Promise<void> {
 export function productNameToId(productName: string): string {
   return productName.toLowerCase().replace(/\s+/g, '-');
 }
+
+/**
+ * Resolve nested object paths like "data.id".
+ */
+export function getValueByPath(input: unknown, path: string): unknown {
+  if (!path) {
+    return input;
+  }
+
+  return path.split('.').reduce<unknown>((acc, segment) => {
+    if (acc && typeof acc === 'object' && segment in (acc as Record<string, unknown>)) {
+      return (acc as Record<string, unknown>)[segment];
+    }
+
+    return undefined;
+  }, input);
+}

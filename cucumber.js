@@ -32,5 +32,19 @@ module.exports = {
     require: ['features/step-definitions/**/*.ts'],
     requireModule: ['ts-node/register'],
     format: ['progress-bar']
+  },
+
+  // API-focused profile
+  api: {
+    paths: ['features/api.feature'],
+    require: ['features/step-definitions/**/*.ts'],
+    requireModule: ['ts-node/register'],
+    format: [
+      'progress-bar',
+      'html:test-results/cucumber-api-report.html',
+      'json:test-results/cucumber-api-report.json',
+      'summary'
+    ],
+    publishQuiet: true
   }
 };

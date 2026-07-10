@@ -26,29 +26,34 @@ nvm alias default 18
 ## Project Structure
 
 ```
-├── features/                    # Cucumber BDD feature files
-│   ├── login.feature            # Login scenarios
-│   ├── cart.feature             # Shopping cart scenarios
-│   ├── checkout.feature         # Checkout process scenarios
-│   ├── inventory.feature        # Product inventory scenarios
-│   └── step-definitions/        # Step implementations
-│       ├── common.steps.ts      # Shared hooks and setup
-│       ├── login.steps.ts       # Login step definitions
-│       ├── cart.steps.ts        # Cart step definitions
-│       ├── checkout.steps.ts    # Checkout step definitions
-│       ├── inventory.steps.ts   # Inventory step definitions
-│       └── helpers.ts           # Helper functions
+├── features/                         # Cucumber BDD feature files
+│   ├── api.feature                   # API interaction scenarios
+│   ├── login.feature                 # Login scenarios
+│   ├── cart.feature                  # Shopping cart scenarios
+│   ├── checkout.feature              # Checkout process scenarios
+│   ├── inventory.feature             # Product inventory scenarios
+│   └── step-definitions/             # Active Cucumber step implementations
+│       ├── common.steps.ts           # Shared hooks + world setup (UI + API)
+│       ├── api.steps.ts              # API request/response steps
+│       ├── login.steps.ts            # Login step definitions
+│       ├── cart.steps.ts             # Cart step definitions
+│       ├── checkout.steps.ts         # Checkout step definitions
+│       ├── inventory.steps.ts        # Inventory step definitions
+│       └── helpers.ts                # Shared step helper utilities
 ├── tests/
-│   ├── pages/                   # Page Object Model classes
-│   │   ├── loginpage.ts         # Login page interactions
-│   │   ├── inventorypage.ts     # Product catalog page
-│   │   ├── cartpage.ts          # Shopping cart page
-│   │   └── checkoutpage.ts      # Checkout flow pages
-│   ├── steps/                   # Additional step definitions (optional)
-│   └── tests/                   # Playwright test specifications
-│       ├── loginpage.spec.ts
-│       ├── cartpage.spec.ts
-│       └── checkoutpage.spec.ts
+│   ├── api/
+│   │   └── reqres.client.ts          # Reusable ReqRes API client wrapper
+│   ├── pages/                        # Page Object Model classes
+│   │   ├── loginpage.ts              # Login page interactions
+│   │   ├── inventorypage.ts          # Product catalog page
+│   │   ├── cartpage.ts               # Shopping cart page
+│   │   └── checkoutpage.ts           # Checkout flow pages
+│   ├── tests/                        # Playwright test specifications
+│   │   ├── loginpage.spec.ts
+│   │   ├── cartpage.spec.ts
+│   │   └── checkoutpage.spec.ts
+│   └── _archive/
+│       └── steps_legacy/             # Archived duplicate step defs (not used by active scripts)
 ├── .vscode/                     # VS Code workspace settings
 │   └── settings.json            # Cucumber autocomplete configuration
 ├── test-results/                # Test reports and artifacts
@@ -106,6 +111,10 @@ nvm alias default 18
    
    # Base URL
    BASE_URL=https://www.saucedemo.com
+
+   # API Settings
+   API_BASE_URL=https://reqres.in/api/
+   REQRES_API_KEY=<your_real_reqres_key>
    
    # Screenshot Settings
    SCREENSHOT_ON_FAILURE=true
@@ -159,6 +168,11 @@ npm run test:cucumber:headless
 npm run test:cucumber:login
 ```
 
+**Run API feature profile only:**
+```sh
+npm run test:cucumber:api
+```
+
 **Run all tests (Playwright + Cucumber):**
 ```sh
 npm run test:all
@@ -190,6 +204,13 @@ npm run clean
 #### Inventory Feature (`features/inventory.feature`)
 - ✅ View inventory items
 - ✅ Add multiple items to cart
+
+#### API Feature (`features/api.feature`)
+- ✅ GET full and filtered data
+- ✅ POST user creation
+- ✅ PUT user update
+- ✅ DELETE user removal
+- ✅ Error handling for invalid API request payloads
 
 ### Playwright Test Specifications
 
@@ -250,11 +271,21 @@ All page interactions are abstracted into reusable page objects located in `test
 Step definitions are located in `features/step-definitions/` and map Gherkin steps to page object methods.
 
 - **common.steps.ts** - Browser lifecycle, World configuration, screenshot on failure
+- **api.steps.ts** - API request execution and response assertions
 - **login.steps.ts** - Login-related steps
 - **cart.steps.ts** - Shopping cart steps
 - **checkout.steps.ts** - Checkout process steps
 - **inventory.steps.ts** - Product inventory steps
 - **helpers.ts** - Reusable utility functions
+
+### API Integration
+
+API coverage is implemented through a dedicated BDD + client layering:
+
+- **Feature file**: `features/api.feature`
+- **Step definitions**: `features/step-definitions/api.steps.ts`
+- **Reusable API client**: `tests/api/reqres.client.ts`
+- **API request context + auth header setup**: `features/step-definitions/common.steps.ts`
 
 ## Configuration
 
@@ -264,6 +295,7 @@ Multiple profiles are available:
 - **default** - Standard test execution with HTML/JSON reports
 - **headless** - CI/CD optimized with parallel execution
 - **login** - Run only login feature tests
+- **api** - Run only API feature tests with dedicated API report output
 
 ### Playwright Configuration (`playwright.config.ts`)
 
@@ -312,6 +344,42 @@ export HEADLESS=true
 export RECORD_VIDEO=false
 npm run test:all
 ```
+
+## Folder Structure Improvements
+
+The current structure works, but these changes will improve maintainability as coverage grows:
+
+1. **Retire legacy duplicate steps under `tests/steps/`**
+   - Active scripts load `features/step-definitions/**/*.ts`, so `tests/steps/` can confuse maintenance.
+
+2. **Adopt consistent file naming conventions**
+   - Example: `loginpage.ts` -> `login.page.ts`, `cartpage.spec.ts` -> `cart.page.spec.ts`.
+
+3. **Introduce shared config module**
+   - Centralize base URLs, timeouts, and environment access helpers to reduce hardcoded values.
+
+4. **Add feature tags for selective execution**
+   - Suggested tags: `@ui`, `@api`, `@smoke`, `@regression`.
+
+5. **Create API contract assertion helpers**
+   - Move response shape/type checks into reusable contract validators for stronger API quality gates.
+
+6. **Optional long-term domain layout**
+   - Example target:
+     - `src/ui/pages`
+     - `src/ui/steps`
+     - `src/api/clients`
+     - `src/api/contracts`
+     - `src/shared/config`
+
+### Recommended Incremental Migration Path
+
+1. Keep existing scripts and behavior stable.
+2. Remove `tests/steps/` after a final verification pass.
+3. Add shared config + tags.
+4. Add API contract validators.
+5. Rename files gradually in small PRs.
+6. Move to domain layout only after CI stability is confirmed.
 
 ## Upgrading Dependencies
 

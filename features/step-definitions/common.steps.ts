@@ -1,9 +1,10 @@
 import { Before, After, BeforeAll, AfterAll, setDefaultTimeout, setWorldConstructor, World, IWorldOptions } from '@cucumber/cucumber';
-import { Browser, Page, chromium, BrowserContext } from '@playwright/test';
+import { Browser, Page, chromium, BrowserContext, APIRequestContext, request } from '@playwright/test';
 import { LoginPage } from '../../tests/pages/loginpage';
 import { InventoryPage } from '../../tests/pages/inventorypage';
 import { CartPage } from '../../tests/pages/cartpage';
 import { CheckoutPage } from '../../tests/pages/checkoutpage';
+import { ReqResClient, ApiCallResult } from '../../tests/api/reqres.client';
 import * as dotenv from 'dotenv';
 
 // Load environment variables
@@ -14,14 +15,24 @@ setDefaultTimeout(60 * 1000);
 
 let browser: Browser;
 
+function normalizeApiBaseUrl(raw?: string): string {
+  const fallback = 'https://reqres.in/api/';
+  const value = (raw || fallback).trim();
+
+  return value.endsWith('/') ? value : `${value}/`;
+}
+
 // Custom World class with page objects
 export class CustomWorld extends World {
   page!: Page;
   context!: BrowserContext;
+  apiContext!: APIRequestContext;
   loginPage!: LoginPage;
   inventoryPage!: InventoryPage;
   cartPage!: CartPage;
   checkoutPage!: CheckoutPage;
+  reqResClient!: ReqResClient;
+  lastApiResult?: ApiCallResult;
 
   constructor(options: IWorldOptions) {
     super(options);
@@ -43,6 +54,14 @@ Before(async function (this: CustomWorld) {
     viewport: { width: 1280, height: 720 },
     recordVideo: process.env.RECORD_VIDEO === 'true' ? { dir: 'test-results/videos' } : undefined
   });
+
+  this.apiContext = await request.newContext({
+    baseURL: normalizeApiBaseUrl(process.env.API_BASE_URL),
+    extraHTTPHeaders: {
+      'x-api-key': process.env.REQRES_API_KEY || 'reqres-free-v1'
+    }
+  });
+
   this.page = await this.context.newPage();
   
   // Initialize page objects
@@ -50,6 +69,8 @@ Before(async function (this: CustomWorld) {
   this.inventoryPage = new InventoryPage(this.page);
   this.cartPage = new CartPage(this.page);
   this.checkoutPage = new CheckoutPage(this.page);
+  this.reqResClient = new ReqResClient(this.apiContext);
+  this.lastApiResult = undefined;
 });
 
 After(async function (this: CustomWorld, { result }) {
@@ -67,6 +88,9 @@ After(async function (this: CustomWorld, { result }) {
   }
   if (this.context) {
     await this.context.close();
+  }
+  if (this.apiContext) {
+    await this.apiContext.dispose();
   }
 });
 
