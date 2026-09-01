@@ -1,396 +1,209 @@
 # Sauce Demo - Test Automation Suite
 
-End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using **Playwright** and **Cucumber BDD** with TypeScript. This project implements the Page Object Model (POM) pattern to test key e-commerce workflows including authentication, shopping cart operations, and checkout processes.
+End-to-end test automation for [SauceDemo](https://www.saucedemo.com) using **Playwright** and **Cucumber BDD** with TypeScript. Tests UI workflows and APIs using the Page Object Model pattern.
 
-## ⚠️ Prerequisites
+## Prerequisites
 
-**Critical Requirements:**
-- **Node.js v18 or higher** (v16 is not supported by Playwright)
-- npm or yarn package manager
+- **Node.js v18+** ⚠️ **Required** (v16 not supported)
+- **npm** (included with Node.js)
 
-**Verify your Node.js version:**
+**Check your Node version:**
 ```sh
-node --version  # Must be v18.x.x or higher
+node --version
 ```
 
-**If you need to upgrade Node.js:**
+**Upgrade Node if needed:**
 ```sh
-# Using nvm (recommended)
-nvm install 18
-nvm use 18
-nvm alias default 18
-
+nvm install 18 && nvm use 18
 # Or download from https://nodejs.org
 ```
 
 ## Project Structure
 
 ```
-├── features/                         # Cucumber BDD feature files
-│   ├── api.feature                   # API interaction scenarios
-│   ├── login.feature                 # Login scenarios
-│   ├── cart.feature                  # Shopping cart scenarios
-│   ├── checkout.feature              # Checkout process scenarios
-│   ├── inventory.feature             # Product inventory scenarios
-│   └── step-definitions/             # Active Cucumber step implementations
-│       ├── common.steps.ts           # Shared hooks + world setup (UI + API)
-│       ├── api.steps.ts              # API request/response steps
-│       ├── login.steps.ts            # Login step definitions
-│       ├── cart.steps.ts             # Cart step definitions
-│       ├── checkout.steps.ts         # Checkout step definitions
-│       ├── inventory.steps.ts        # Inventory step definitions
-│       └── helpers.ts                # Shared step helper utilities
-├── tests/
-│   ├── api/
-│   │   └── reqres.client.ts          # Reusable ReqRes API client wrapper
-│   ├── pages/                        # Page Object Model classes
-│   │   ├── loginpage.ts              # Login page interactions
-│   │   ├── inventorypage.ts          # Product catalog page
-│   │   ├── cartpage.ts               # Shopping cart page
-│   │   └── checkoutpage.ts           # Checkout flow pages
-│   ├── tests/                        # Playwright test specifications
-│   │   ├── loginpage.spec.ts
-│   │   ├── cartpage.spec.ts
-│   │   └── checkoutpage.spec.ts
-│   └── _archive/
-│       └── steps_legacy/             # Archived duplicate step defs (not used by active scripts)
-├── .vscode/                     # VS Code workspace settings
-│   └── settings.json            # Cucumber autocomplete configuration
-├── test-results/                # Test reports and artifacts
-│   ├── screenshots/             # Failure screenshots
-│   └── videos/                  # Test recordings
-├── .env.example                 # Environment variable template
-├── .gitignore                   # Git ignore rules
-├── cucumber.js                  # Cucumber configuration
-├── playwright.config.ts         # Playwright configuration
-└── tsconfig.json               # TypeScript configuration
+features/
+├── api.feature                 # API scenarios
+├── login.feature              # Login scenarios
+├── cart.feature               # Shopping cart scenarios
+├── checkout.feature           # Checkout scenarios
+├── inventory.feature          # Inventory scenarios
+└── step-definitions/          # Step implementations
+    ├── common.steps.ts        # Hooks + World setup
+    ├── api.steps.ts           # API steps
+    ├── login.steps.ts         # Login steps
+    ├── cart.steps.ts          # Cart steps
+    ├── checkout.steps.ts      # Checkout steps
+    ├── inventory.steps.ts     # Inventory steps
+    └── helpers.ts             # Utilities
+
+tests/
+├── pages/                     # Page Object Model
+│   ├── loginpage.ts
+│   ├── inventorypage.ts
+│   ├── cartpage.ts
+│   └── checkoutpage.ts
+├── api/
+│   └── reqres.client.ts       # API client wrapper
+├── tests/                     # Playwright test specs
+│   ├── loginpage.spec.ts
+│   ├── cartpage.spec.ts
+│   └── checkoutpage.spec.ts
+└── _archive/                  # Deprecated files
+
+test-results/                  # Reports & artifacts
+├── screenshots/
+└── videos/
+
+.env.example                   # Environment template
+cucumber.js                    # Cucumber config
+playwright.config.ts          # Playwright config
+tsconfig.json                 # TypeScript config
 ```
-
-## Requirements
-
-- **Node.js** v18 or higher ⚠️ **REQUIRED**
-- **npm** v8 or higher (comes with Node.js)
-- **Playwright** v1.54.1 or higher
-- **Cucumber** v7.3.2
-- **TypeScript** (included as dev dependency)
 
 ## Setup
 
-1. **Verify Node.js version:**
-   ```sh
-   node --version  # Must show v18.x.x or higher
-   ```
-   If you're running Node.js v16 or lower, you **must upgrade** before proceeding.
-
-2. **Install dependencies:**
+1. **Install dependencies:**
    ```sh
    npm install
    ```
 
-3. **Install Playwright browsers:**
+2. **Install Playwright browsers:**
    ```sh
    npx playwright install chromium
    ```
 
-4. **Environment variables:**
-   Create a `.env` file based on `.env.example`:
+3. **Create environment file:**
    ```sh
    cp .env.example .env
    ```
-   
-   Configure your settings in `.env`:
+
+4. **Configure your `.env` file:**
    ```env
-   # Browser Settings
+   # Browser settings
    HEADLESS=false
    SLOW_MO=100
    RECORD_VIDEO=false
    
-   # Test Credentials
+   # Test credentials
    STANDARD_USERNAME=standard_user
    PASSWORD=secret_sauce
    
-   # Base URL
+   # URLs
    BASE_URL=https://www.saucedemo.com
-
-   # API Settings
    API_BASE_URL=https://reqres.in/api/
-   REQRES_API_KEY=<your_real_reqres_key>
+   REQRES_API_KEY=<your_key>
    
-   # Screenshot Settings
+   # Screenshots
    SCREENSHOT_ON_FAILURE=true
    ```
-   
-   **⚠️ Important:** Never commit your `.env` file - it's already in `.gitignore`
 
 ## Running Tests
 
 ### Playwright Tests
-
-**Run all Playwright tests:**
 ```sh
-npm run test:playwright
-```
-
-**Run specific test file:**
-```sh
-npx playwright test tests/tests/loginpage.spec.ts
-```
-
-**Run tests in headed mode:**
-```sh
-npx playwright test --headed
-```
-
-**Run tests with UI:**
-```sh
-npx playwright test --ui
-```
-
-**View Playwright report:**
-```sh
-npx playwright show-report
+npm run test:playwright              # Run all tests
+npx playwright test --headed         # Run in visible browser
+npx playwright test --ui             # Run with UI mode
+npx playwright show-report           # View HTML report
 ```
 
 ### Cucumber BDD Tests
-
-**Run all Cucumber tests:**
 ```sh
-npm run test:cucumber
+npm run test:cucumber                # Run all features
+npm run test:cucumber:headless       # Run in CI mode
+npm run test:cucumber:login          # Run login feature only
+npm run test:cucumber:api            # Run API feature only
 ```
 
-**Run in headless mode (for CI/CD):**
+### All Tests
 ```sh
-npm run test:cucumber:headless
+npm run test:all                     # Run Playwright + Cucumber
+npm run clean                        # Clean test artifacts
 ```
 
-**Run specific feature:**
+### CI/CD Usage
 ```sh
-npm run test:cucumber:login
-```
-
-**Run API feature profile only:**
-```sh
-npm run test:cucumber:api
-```
-
-**Run all tests (Playwright + Cucumber):**
-```sh
-npm run test:all
-```
-
-### Utility Commands
-
-**Clean test artifacts:**
-```sh
-npm run clean
+HEADLESS=true npm run test:cucumber  # Headless mode
+RECORD_VIDEO=true npm run test:all   # Record videos
 ```
 
 ## Test Coverage
 
-### Cucumber BDD Feature Files
-
-#### Login Feature (`features/login.feature`)
-- ✅ Successful login with valid credentials
-- ❌ Unsuccessful login with invalid credentials
-
-#### Shopping Cart Feature (`features/cart.feature`)
-- ✅ Add item to cart and verify badge count
-- ✅ Navigate from cart to checkout
-
-#### Checkout Feature (`features/checkout.feature`)
-- ✅ Complete shipping information
-- ✅ Complete full checkout with order confirmation
-
-#### Inventory Feature (`features/inventory.feature`)
-- ✅ View inventory items
-- ✅ Add multiple items to cart
-
-#### API Feature (`features/api.feature`)
-- ✅ GET full and filtered data
-- ✅ POST user creation
-- ✅ PUT user update
-- ✅ DELETE user removal
-- ✅ Error handling for invalid API request payloads
-
-### Playwright Test Specifications
-
-#### Login Tests (`tests/tests/loginpage.spec.ts`)
-- ✅ Successful login with valid credentials
-- ❌ Unsuccessful login with invalid credentials
-
-#### Cart Tests (`tests/tests/cartpage.spec.ts`)
-- ✅ Add item to cart and update badge count
-- ✅ Navigate from cart to checkout
-
-#### Checkout Tests (`tests/tests/checkoutpage.spec.ts`)
-- ✅ Complete shipping info and reach overview
-- ✅ Complete checkout with confirmation
+| Feature | Scenarios | Status |
+|---------|-----------|--------|
+| **Login** | Valid credentials, Invalid credentials | ✅ Implemented |
+| **Inventory** | View products, Add items to cart | ✅ Implemented |
+| **Cart** | Add items, Navigate to checkout | ✅ Implemented |
+| **Checkout** | Shipping info, Order confirmation | ✅ Implemented |
+| **API** | GET, POST, PUT, DELETE, Error handling | ✅ Implemented |
 
 ## Architecture
 
 ### Page Object Model (POM)
 
-All page interactions are abstracted into reusable page objects located in `tests/pages/`. Both Playwright and Cucumber tests utilize the same page objects for consistency.
+All page interactions use reusable page objects in `tests/pages/`. Both Playwright and Cucumber tests use the same page objects.
 
-#### LoginPage (`tests/pages/loginpage.ts`)
-- `goto()` - Navigate to login page
-- `login(username, password)` - Perform login
-- `fillUsername(username)` - Fill username field
-- `fillPassword(password)` - Fill password field
-- `clickLogin()` - Click login button
-- `expectErrorMessage(message)` - Validate error messages
-- `expectToBeOnLoginPage()` - URL verification
-- `expectToBeOnInventoryPage()` - Verify successful login
+| Page | Key Methods | Location |
+|------|-------------|----------|
+| **LoginPage** | `goto()`, `login()`, `expectErrorMessage()` | `tests/pages/loginpage.ts` |
+| **InventoryPage** | `addItemToCart()`, `getCartBadgeCount()` | `tests/pages/inventorypage.ts` |
+| **CartPage** | `goto()`, `clickCheckout()`, `expectItemInCart()` | `tests/pages/cartpage.ts` |
+| **CheckoutPage** | `fillShippingInfo()`, `clickFinish()`, `expectCompleteHeader()` | `tests/pages/checkoutpage.ts` |
 
-#### InventoryPage (`tests/pages/inventorypage.ts`)
-- `addItemToCart(itemId)` - Add product to cart
-- `removeItemFromCart(itemId)` - Remove product from cart
-- `getCartBadgeCount()` - Get cart item count
-- `expectCartBadgeCount(count)` - Validate cart badge
-- `expectToBeOnInventoryPage()` - URL verification
+### Step Definitions & Helpers
 
-#### CartPage (`tests/pages/cartpage.ts`)
-- `goto()` - Navigate to cart page
-- `clickCartLink()` - Click cart icon
-- `clickCheckout()` - Proceed to checkout
-- `expectItemInCart(itemName)` - Verify item in cart
-- `expectToBeOnCartPage()` - URL verification
-- `getCartBadgeCount()` - Get cart badge count
-
-#### CheckoutPage (`tests/pages/checkoutpage.ts`)
-- `fillShippingInfo(firstName, lastName, postalCode)` - Enter shipping details
-- `clickContinue()` - Continue to next step
-- `clickFinish()` - Complete checkout
-- `expectToBeOnStepOne()` - Verify checkout step one
-- `expectToBeOnStepTwo()` - Verify checkout overview
-- `expectToBeOnComplete()` - Verify order confirmation
-- `expectCompleteHeader(message)` - Validate confirmation message
-
-### Cucumber Step Definitions
-
-Step definitions are located in `features/step-definitions/` and map Gherkin steps to page object methods.
-
-- **common.steps.ts** - Browser lifecycle, World configuration, screenshot on failure
-- **api.steps.ts** - API request execution and response assertions
-- **login.steps.ts** - Login-related steps
-- **cart.steps.ts** - Shopping cart steps
-- **checkout.steps.ts** - Checkout process steps
-- **inventory.steps.ts** - Product inventory steps
-- **helpers.ts** - Reusable utility functions
+- **common.steps.ts** - Browser lifecycle, World setup
+- **api.steps.ts** - API requests and assertions
+- **login/cart/checkout/inventory.steps.ts** - Feature-specific steps
+- **helpers.ts** - Shared utilities (login, path resolution)
 
 ### API Integration
 
-API coverage is implemented through a dedicated BDD + client layering:
-
 - **Feature file**: `features/api.feature`
-- **Step definitions**: `features/step-definitions/api.steps.ts`
-- **Reusable API client**: `tests/api/reqres.client.ts`
-- **API request context + auth header setup**: `features/step-definitions/common.steps.ts`
+- **Steps**: `features/step-definitions/api.steps.ts`
+- **Client**: `tests/api/reqres.client.ts` (wraps Playwright APIRequestContext)
 
-## Configuration
+## Configuration Files
 
-### Cucumber Configuration (`cucumber.js`)
+| File | Purpose |
+|------|---------|
+| **cucumber.js** | Cucumber profiles: `default`, `headless`, `login`, `api` |
+| **playwright.config.ts** | Chromium config, HTML reporting, trace on retry |
+| **tsconfig.json** | TypeScript: CommonJS, ES2020 target |
 
-Multiple profiles are available:
-- **default** - Standard test execution with HTML/JSON reports
-- **headless** - CI/CD optimized with parallel execution
-- **login** - Run only login feature tests
-- **api** - Run only API feature tests with dedicated API report output
+## Reports & Artifacts
 
-### Playwright Configuration (`playwright.config.ts`)
+```
+test-results/
+├── cucumber-report.html         # Cucumber HTML report
+├── cucumber-report.json         # Cucumber JSON report
+├── screenshots/                 # Failure screenshots
+└── videos/                      # Test recordings (if enabled)
 
-Configured for:
-- Chromium browser testing
-- HTML reporting
-- Trace on first retry
-- Environment variable support
-
-### TypeScript Configuration (`tsconfig.json`)
-
-Set up for:
-- CommonJS module resolution
-- ES2020 target
-- Cucumber and Node type support
-
-## Test Reports
-
-### Cucumber Reports
-- **HTML Report**: `test-results/cucumber-report.html`
-- **JSON Report**: `test-results/cucumber-report.json`
-
-### Playwright Reports
-- **HTML Report**: `playwright-report/index.html`
-
-### Artifacts
-- **Screenshots**: `test-results/screenshots/` (captured on failure)
-- **Videos**: `test-results/videos/` (when enabled)
-
-
-**Run tests in headless mode:**
-```sh
-HEADLESS=true npm run test:cucumber
+playwright-report/
+└── index.html                   # Playwright HTML report
 ```
 
-**Clean before running in CI:**
-```sh
-npm run clean && npm run test:all
-```
+## Next Steps & Improvements
 
-**Environment-specific configuration:**
-```sh
-# CI environment
-export CI=true
-export HEADLESS=true
-export RECORD_VIDEO=false
-npm run test:all
-```
-
-## Folder Structure Improvements
-
-The current structure works, but these changes will improve maintainability as coverage grows:
-
-1. **Retire legacy duplicate steps under `tests/steps/`**
-   - Active scripts load `features/step-definitions/**/*.ts`, so `tests/steps/` can confuse maintenance.
-
-2. **Adopt consistent file naming conventions**
-   - Example: `loginpage.ts` -> `login.page.ts`, `cartpage.spec.ts` -> `cart.page.spec.ts`.
-
-3. **Introduce shared config module**
-   - Centralize base URLs, timeouts, and environment access helpers to reduce hardcoded values.
-
-4. **Add feature tags for selective execution**
-   - Suggested tags: `@ui`, `@api`, `@smoke`, `@regression`.
-
-5. **Create API contract assertion helpers**
-   - Move response shape/type checks into reusable contract validators for stronger API quality gates.
-
-6. **Optional long-term domain layout**
-   - Example target:
-     - `src/ui/pages`
-     - `src/ui/steps`
-     - `src/api/clients`
-     - `src/api/contracts`
-     - `src/shared/config`
-
-### Recommended Incremental Migration Path
-
-1. Keep existing scripts and behavior stable.
-2. Remove `tests/steps/` after a final verification pass.
-3. Add shared config + tags.
-4. Add API contract validators.
-5. Rename files gradually in small PRs.
-6. Move to domain layout only after CI stability is confirmed.
+1. **Add test tags** - Use `@ui`, `@api`, `@smoke` for selective execution
+2. **Enhance API testing** - Add scenario outlines, performance assertions, error cases
+3. **Create shared config module** - Centralize URLs, timeouts, credentials
+4. **API contract validators** - Reusable response shape/type checkers
+5. **Retire legacy files** - Remove `tests/_archive/` after verification
+6. **Consistent naming** - Rename to `login.page.ts`, `login.page.spec.ts`
 
 ## Upgrading Dependencies
 
-**Update Playwright:**
 ```sh
+# Update Playwright
 npm install -D @playwright/test@latest
 npx playwright install
-```
 
-**Update Cucumber:**
-```sh
+# Update Cucumber
 npm install @cucumber/cucumber@latest
+
+# Update all dependencies
+npm update
 ```
 
