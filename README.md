@@ -48,7 +48,6 @@ tests/
 │   ├── loginpage.spec.ts
 │   ├── cartpage.spec.ts
 │   └── checkoutpage.spec.ts
-└── _archive/                  # Deprecated files
 
 test-results/                  # Reports & artifacts
 ├── screenshots/
@@ -190,8 +189,7 @@ playwright-report/
 2. **Enhance API testing** - Add scenario outlines, performance assertions, error cases
 3. **Create shared config module** - Centralize URLs, timeouts, credentials
 4. **API contract validators** - Reusable response shape/type checkers
-5. **Retire legacy files** - Remove `tests/_archive/` after verification
-6. **Consistent naming** - Rename to `login.page.ts`, `login.page.spec.ts`
+5. **Consistent naming** - Rename to `login.page.ts`, `login.page.spec.ts`
 
 ## Upgrading Dependencies
 
