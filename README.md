@@ -112,6 +112,7 @@ npm run test:cucumber                # Run all features
 npm run test:cucumber:headless       # Run in CI mode
 npm run test:cucumber:login          # Run login feature only
 npm run test:cucumber:api            # Run API feature only without launching a browser
+npm run test:cucumber:report         # Run all Cucumber features and generate HTML/JSON reports
 ```
 
 ### All Tests

@@ -14,6 +14,7 @@
     "test:cucumber:headless": "HEADLESS=true cucumber-js --profile headless",
     "test:cucumber:login": "cucumber-js --profile login",
     "test:cucumber:api": "API_ONLY=true cucumber-js --profile api",
+    "test:cucumber:report": "cucumber-js --profile report",
     "test:playwright": "playwright test",
     "test:all": "npm run test:playwright && npm run test:cucumber",
     "clean": "rm -rf test-results cucumber-report.* playwright-report"
