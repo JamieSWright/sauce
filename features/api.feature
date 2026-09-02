@@ -1,3 +1,4 @@
+@api
 Feature: API Interactions
   As a test engineer
   I want to validate public API interactions

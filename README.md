@@ -112,7 +112,7 @@ npx playwright show-report           # View HTML report
 npm run test:cucumber                # Run all features
 npm run test:cucumber:headless       # Run in CI mode
 npm run test:cucumber:login          # Run login feature only
-npm run test:cucumber:api            # Run API feature only
+npm run test:cucumber:api            # Run API feature only without launching a browser
 ```
 
 ### All Tests
@@ -186,7 +186,7 @@ playwright-report/
 
 ## Next Steps & Improvements
 
-1. **Add test tags** - Use `@ui`, `@api`, `@smoke` for selective execution
+1. **Add more test tags** - `@api` is available; add `@ui` and `@smoke` for selective execution
 2. **Enhance API testing** - Add scenario outlines, performance assertions, error cases
 3. **Create shared config module** - Centralize URLs, timeouts, credentials
 4. **API contract validators** - Reusable response shape/type checkers

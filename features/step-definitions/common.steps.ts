@@ -15,6 +15,10 @@ setDefaultTimeout(60 * 1000);
 
 let browser: Browser;
 
+function isApiOnlyRun(): boolean {
+  return process.env.API_ONLY === 'true';
+}
+
 function normalizeApiBaseUrl(raw?: string): string {
   const fallback = 'https://reqres.in/api/';
   const value = (raw || fallback).trim();
@@ -42,6 +46,10 @@ export class CustomWorld extends World {
 setWorldConstructor(CustomWorld);
 
 BeforeAll(async function () {
+  if (isApiOnlyRun()) {
+    return;
+  }
+
   const headless = process.env.HEADLESS === 'true';
   browser = await chromium.launch({ 
     headless,
@@ -50,16 +58,22 @@ BeforeAll(async function () {
 });
 
 Before(async function (this: CustomWorld) {
-  this.context = await browser.newContext({
-    viewport: { width: 1280, height: 720 },
-    recordVideo: process.env.RECORD_VIDEO === 'true' ? { dir: 'test-results/videos' } : undefined
-  });
-
   this.apiContext = await request.newContext({
     baseURL: normalizeApiBaseUrl(process.env.API_BASE_URL),
     extraHTTPHeaders: {
       'x-api-key': process.env.REQRES_API_KEY || 'reqres-free-v1'
     }
+  });
+
+  if (isApiOnlyRun()) {
+    this.reqResClient = new ReqResClient(this.apiContext);
+    this.lastApiResult = undefined;
+    return;
+  }
+
+  this.context = await browser.newContext({
+    viewport: { width: 1280, height: 720 },
+    recordVideo: process.env.RECORD_VIDEO === 'true' ? { dir: 'test-results/videos' } : undefined
   });
 
   this.page = await this.context.newPage();
@@ -75,7 +89,7 @@ Before(async function (this: CustomWorld) {
 
 After(async function (this: CustomWorld, { result }) {
   // Take screenshot on failure
-  if (result?.status === 'FAILED') {
+  if (result?.status === 'FAILED' && this.page) {
     const screenshot = await this.page.screenshot({ 
       path: `test-results/screenshots/failed-${Date.now()}.png`,
       fullPage: true 
