@@ -1,50 +1,8 @@
-module.exports = {
-  default: {
-    paths: ['features/**/*.feature'],
-    require: ['features/step-definitions/**/*.ts'],
-    requireModule: ['ts-node/register'],
-    format: [
-      'progress-bar',
-      'html:test-results/cucumber-report.html',
-      'json:test-results/cucumber-report.json',
-      'summary'
-    ],
-    formatOptions: {
-      snippetInterface: 'async-await'
-    },
-    publishQuiet: true,
-    parallel: 1
-  },
-  
-  // Headless profile for CI/CD
-  headless: {
-    paths: ['features/**/*.feature'],
-    require: ['features/step-definitions/**/*.ts'],
-    requireModule: ['ts-node/register'],
-    format: ['progress-bar', 'json:test-results/cucumber-report.json'],
-    parallel: 2,
-    publishQuiet: true
-  },
-  
-  // Specific feature profiles
-  login: {
-    paths: ['features/login.feature'],
-    require: ['features/step-definitions/**/*.ts'],
-    requireModule: ['ts-node/register'],
-    format: ['progress-bar']
-  },
+const common = 'features/**/*.feature --require-module ts-node/register --require features/step-definitions/**/*.ts';
 
-  // API-focused profile
-  api: {
-    paths: ['features/api.feature'],
-    require: ['features/step-definitions/**/*.ts'],
-    requireModule: ['ts-node/register'],
-    format: [
-      'progress-bar',
-      'html:test-results/cucumber-api-report.html',
-      'json:test-results/cucumber-api-report.json',
-      'summary'
-    ],
-    publishQuiet: true
-  }
+module.exports = {
+  default: `${common} --format progress-bar --format html:test-results/cucumber-report.html --format json:test-results/cucumber-report.json --format summary --format-options '{"snippetInterface":"async-await"}' --publish-quiet --parallel 1`,
+  headless: `${common} --format progress-bar --format json:test-results/cucumber-report.json --parallel 2 --publish-quiet`,
+  login: `features/login.feature --require-module ts-node/register --require features/step-definitions/**/*.ts --format progress-bar --publish-quiet`,
+  api: `features/api.feature --require-module ts-node/register --require features/step-definitions/**/*.ts --format progress-bar --format html:test-results/cucumber-api-report.html --format json:test-results/cucumber-api-report.json --format summary --publish-quiet`
 };
