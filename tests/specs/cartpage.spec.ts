@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
-import { LoginPage } from '../pages/loginpage';
-import { InventoryPage } from '../pages/inventorypage';
-import { CartPage } from '../pages/cartpage';
+import { LoginPage } from '../../support/pages/loginpage';
+import { InventoryPage } from '../../support/pages/inventorypage';
+import { CartPage } from '../../support/pages/cartpage';
 
 
 test.describe('Cart Page Tests', () => {

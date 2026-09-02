@@ -1,5 +1,5 @@
 import {test, expect, Page} from '@playwright/test';
-import { LoginPage } from '../pages/loginpage';
+import { LoginPage } from '../../support/pages/loginpage';
 import { time } from 'console';
 import { TIMEOUT } from 'dns';
 

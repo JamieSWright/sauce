@@ -10,6 +10,6 @@
     "strict": false,
     "types": ["node", "@cucumber/cucumber"]
   },
-  "include": ["features/**/*.ts", "tests/**/*.ts"],
+  "include": ["features/**/*.ts", "support/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules"]
 }

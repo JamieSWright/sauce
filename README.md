@@ -36,18 +36,20 @@ features/
     ├── inventory.steps.ts     # Inventory steps
     └── helpers.ts             # Utilities
 
-tests/
+support/
 ├── pages/                     # Page Object Model
 │   ├── loginpage.ts
 │   ├── inventorypage.ts
 │   ├── cartpage.ts
 │   └── checkoutpage.ts
-├── api/
-│   └── reqres.client.ts       # API client wrapper
-├── tests/                     # Playwright test specs
-│   ├── loginpage.spec.ts
-│   ├── cartpage.spec.ts
-│   └── checkoutpage.spec.ts
+└── api/
+   └── reqres.client.ts       # API client wrapper
+
+tests/
+└── specs/                     # Playwright test specs
+   ├── loginpage.spec.ts
+   ├── cartpage.spec.ts
+   └── checkoutpage.spec.ts
 
 test-results/                  # Reports & artifacts
 ├── screenshots/
@@ -141,14 +143,14 @@ RECORD_VIDEO=true npm run test:all   # Record videos
 
 ### Page Object Model (POM)
 
-All page interactions use reusable page objects in `tests/pages/`. Both Playwright and Cucumber tests use the same page objects.
+All page interactions use reusable page objects in `support/pages/`. Both Playwright and Cucumber tests use the same page objects.
 
 | Page | Key Methods | Location |
 |------|-------------|----------|
-| **LoginPage** | `goto()`, `login()`, `expectErrorMessage()` | `tests/pages/loginpage.ts` |
-| **InventoryPage** | `addItemToCart()`, `getCartBadgeCount()` | `tests/pages/inventorypage.ts` |
-| **CartPage** | `goto()`, `clickCheckout()`, `expectItemInCart()` | `tests/pages/cartpage.ts` |
-| **CheckoutPage** | `fillShippingInfo()`, `clickFinish()`, `expectCompleteHeader()` | `tests/pages/checkoutpage.ts` |
+| **LoginPage** | `goto()`, `login()`, `expectErrorMessage()` | `support/pages/loginpage.ts` |
+| **InventoryPage** | `addItemToCart()`, `getCartBadgeCount()` | `support/pages/inventorypage.ts` |
+| **CartPage** | `goto()`, `clickCheckout()`, `expectItemInCart()` | `support/pages/cartpage.ts` |
+| **CheckoutPage** | `fillShippingInfo()`, `clickFinish()`, `expectCompleteHeader()` | `support/pages/checkoutpage.ts` |
 
 ### Step Definitions & Helpers
 
@@ -161,7 +163,7 @@ All page interactions use reusable page objects in `tests/pages/`. Both Playwrig
 
 - **Feature file**: `features/api.feature`
 - **Steps**: `features/step-definitions/api.steps.ts`
-- **Client**: `tests/api/reqres.client.ts` (wraps Playwright APIRequestContext)
+- **Client**: `support/api/reqres.client.ts` (wraps Playwright APIRequestContext)
 
 ## Configuration Files
 

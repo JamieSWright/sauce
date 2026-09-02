@@ -1,10 +1,10 @@
 import { Before, After, BeforeAll, AfterAll, setDefaultTimeout, setWorldConstructor, World, IWorldOptions } from '@cucumber/cucumber';
 import { Browser, Page, chromium, BrowserContext, APIRequestContext, request } from '@playwright/test';
-import { LoginPage } from '../../tests/pages/loginpage';
-import { InventoryPage } from '../../tests/pages/inventorypage';
-import { CartPage } from '../../tests/pages/cartpage';
-import { CheckoutPage } from '../../tests/pages/checkoutpage';
-import { ReqResClient, ApiCallResult } from '../../tests/api/reqres.client';
+import { LoginPage } from '../../support/pages/loginpage';
+import { InventoryPage } from '../../support/pages/inventorypage';
+import { CartPage } from '../../support/pages/cartpage';
+import { CheckoutPage } from '../../support/pages/checkoutpage';
+import { ReqResClient, ApiCallResult } from '../../support/api/reqres.client';
 import * as dotenv from 'dotenv';
 
 // Load environment variables
